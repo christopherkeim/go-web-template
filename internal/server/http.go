@@ -25,7 +25,7 @@ type ValidationResponse struct {
 }
 
 func getRoot(writer http.ResponseWriter, request *http.Request) {
-	writer.Write([]byte("Hello 🐍 🚀 ✨\n"))
+	writer.Write([]byte("Hello 🦫 🚀 ✨\n"))
 }
 
 func postGopherData(writer http.ResponseWriter, request *http.Request) {
