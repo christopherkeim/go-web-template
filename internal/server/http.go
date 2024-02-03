@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/christopherkeim/go-web-template/internal/logging"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -24,10 +26,30 @@ type ValidationResponse struct {
 	State      string `json:"state"`
 }
 
+func RunHTTPServerOnAddress(address string) {
+	router := chi.NewRouter()
+	setMiddlewares(router)
+	setRoutes(router)
+
+	logrus.Info("Starting HTTP server")
+
+	err := http.ListenAndServe(address, router)
+	if err != nil {
+		logrus.WithError(err).Panic("Unable to start HTTP server")
+	}
+}
+
+func setRoutes(router *chi.Mux) {
+	router.Get("/", getRoot)
+	router.Post("/gopher", postGopherData)
+}
+
+// GET endpoint
 func getRoot(writer http.ResponseWriter, request *http.Request) {
 	writer.Write([]byte("Hello 🦫 🚀 ✨\n"))
 }
 
+// POST endpoint
 func postGopherData(writer http.ResponseWriter, request *http.Request) {
 	if dayOfWeek := chi.URLParam(request, "day_of_week"); dayOfWeek != "" {
 		// Stdout on server
@@ -57,27 +79,10 @@ func postGopherData(writer http.ResponseWriter, request *http.Request) {
 	writer.Write([]byte(jsonResponse))
 }
 
-func RunHTTPServerOnAddress(address string) {
-	router := chi.NewRouter()
-	setMiddlewares(router)
-
-	// GET endpoint
-	router.Get("/", getRoot)
-	// POST endpoint
-	router.Post("/gopher", postGopherData)
-
-	logrus.Info("Starting HTTP server")
-
-	err := http.ListenAndServe(address, router)
-	if err != nil {
-		logrus.WithError(err).Panic("Unable to start HTTP server")
-	}
-}
-
 func setMiddlewares(router *chi.Mux) {
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
-	router.Use(NewStructuredLogger(logrus.StandardLogger()))
+	router.Use(logging.NewStructuredLogger(logrus.StandardLogger()))
 	router.Use(middleware.Recoverer)
 
 	addCorsMiddleware(router)
