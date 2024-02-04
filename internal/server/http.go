@@ -40,17 +40,17 @@ func RunHTTPServerOnAddress(address string) {
 }
 
 func setRoutes(router *chi.Mux) {
-	router.Get("/", getRoot)
-	router.Post("/gopher", postGopherData)
+	router.Get("/", GetRoot)
+	router.Post("/gopher", PostGopherData)
 }
 
 // GET endpoint
-func getRoot(writer http.ResponseWriter, request *http.Request) {
+func GetRoot(writer http.ResponseWriter, request *http.Request) {
 	writer.Write([]byte("Hello 🦫 🚀 ✨\n"))
 }
 
 // POST endpoint
-func postGopherData(writer http.ResponseWriter, request *http.Request) {
+func PostGopherData(writer http.ResponseWriter, request *http.Request) {
 	if dayOfWeek := chi.URLParam(request, "day_of_week"); dayOfWeek != "" {
 		// Stdout on server
 		fmt.Println(dayOfWeek)
