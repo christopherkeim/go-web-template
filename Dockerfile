@@ -11,7 +11,10 @@ WORKDIR /app
 COPY . .
 
 # Build binary
-RUN go build -o main main.go
+RUN CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64 \
+    go build -o main main.go
 
 ###############################################################
 # Final
@@ -26,4 +29,4 @@ COPY --from=build /app/main ./main
 
 EXPOSE 8000
 
-ENTRYPOINT [ "./main" ]
+ENTRYPOINT ["./main"]
