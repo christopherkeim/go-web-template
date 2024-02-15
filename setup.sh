@@ -19,6 +19,15 @@
 # Pull the current machine's distro for GPG key targeting
 readonly DISTRO="$(lsb_release -d | awk -F ' ' '{print tolower($2)}')"
 
+# Pull the machine's chip architecture
+if [ "$(uname -m)" == "x86_64" ]
+then
+  CHIP_ARCH="amd64"
+else
+  CHIP_ARCH="arm64"
+fi
+
+readonly CHIP_ARCH
 
 # -----------------------------------------------------------------------------------------------------------
 # 1) Base Requirements: this will ensure that you base requirements along with some data science
@@ -120,13 +129,6 @@ fi
 # 2) Go Install: here we'll install and configure Go
 # -----------------------------------------------------------------------------------------------------------
 
-# Pull the machine's chip architecture
-if [ "$(uname -m)" == "x86_64" ]
-then
-  CHIP_ARCH="amd64"
-else
-  CHIP_ARCH="arm64"
-fi
 
 # Install Go
 if ( which go > /dev/null )
@@ -165,7 +167,6 @@ fi
 # 3.1) Set up the repository: Before you install Docker Engine for the first time on a new host machine, 
 # you need to set up the Docker repository. Afterward, you can install and update Docker from the repository.
 # -----------------------------------------------------------------------------------------------------------
-
 
 # Add Docker’s official GPG key
 if [[ -f /etc/apt/keyrings/docker.gpg ]]; then
