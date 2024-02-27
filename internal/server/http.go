@@ -1,8 +1,6 @@
 package server
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -15,17 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type GopherData struct {
-	Name        string `json:"name"`
-	Age         int    `json:"age"`
-	Description string `json:"description"`
-}
-
-type ValidationResponse struct {
-	GopherName string `json:"gopher_name"`
-	State      string `json:"state"`
-}
-
 func RunHTTPServerOnAddress(address string) {
 	router := chi.NewRouter()
 	setMiddlewares(router)
@@ -37,46 +24,6 @@ func RunHTTPServerOnAddress(address string) {
 	if err != nil {
 		logrus.WithError(err).Panic("Unable to start HTTP server")
 	}
-}
-
-func setRoutes(router *chi.Mux) {
-	router.Get("/", GetRoot)
-	router.Post("/gopher", PostGopherData)
-}
-
-// GET endpoint
-func GetRoot(writer http.ResponseWriter, request *http.Request) {
-	writer.Write([]byte("Hello 🦫 🚀 ✨\n"))
-}
-
-// POST endpoint
-func PostGopherData(writer http.ResponseWriter, request *http.Request) {
-	if dayOfWeek := chi.URLParam(request, "day_of_week"); dayOfWeek != "" {
-		// Stdout on server
-		fmt.Println(dayOfWeek)
-	}
-	// Parse the body and extract the GopherData properties
-	request.Body = http.MaxBytesReader(writer, request.Body, 1048576)
-	decoder := json.NewDecoder((request.Body))
-	var gopher GopherData
-	parsingError := decoder.Decode(&gopher)
-
-	if parsingError != nil {
-		fmt.Printf("Parsing Error: %s", parsingError.Error())
-		return
-	}
-
-	// Construct the validation response
-	validationResponse := ValidationResponse{GopherName: gopher.Name, State: "success"}
-	jsonResponse, jsonError := json.Marshal(validationResponse)
-
-	if jsonError != nil {
-		fmt.Printf("JSON Error: %s", jsonError.Error())
-		return
-	}
-
-	// Send the response back to the client
-	writer.Write([]byte(jsonResponse))
 }
 
 func setMiddlewares(router *chi.Mux) {
