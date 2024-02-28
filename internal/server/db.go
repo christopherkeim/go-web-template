@@ -25,7 +25,7 @@ func initDb() Db {
 }
 
 func makeUsers() []User {
-	users := make([]User, 5)
+	users := make([]User, 0, 5)
 	for i := range 5 {
 		nextUser := User{
 			Guid:      fmt.Sprintf("dummy%d", (i+1)*100),
