@@ -17,22 +17,25 @@ func GetSingleUser(db *Db) http.HandlerFunc {
 
 		guid := chi.URLParam(request, "guid")
 
-		if guid == "" {
-			writer.Write([]byte(fmt.Sprintf("No input guid: %d", http.StatusNotFound)))
-			return
-		}
-
-		var foundUser User
+		foundUser := false
+		var targetUser User
 		for _, user := range *db {
 			if guid == user.Guid {
-				foundUser = user
+				foundUser = true
+				targetUser = user
 				break
 			}
 		}
 
-		jsonResponse, jsonError := json.Marshal(foundUser)
+		if !foundUser {
+			writer.Write([]byte(fmt.Sprintf("User not found: %d", http.StatusNotFound)))
+			return
+		}
+
+		jsonResponse, jsonError := json.Marshal(targetUser)
 		if jsonError != nil {
 			fmt.Printf("JSON Error: %s", jsonError.Error())
+			writer.Write([]byte(fmt.Sprintf("Internal server error: %d", http.StatusInternalServerError)))
 			return
 		}
 
@@ -47,6 +50,7 @@ func GetAllUsers(db *Db) http.HandlerFunc {
 		jsonResponse, jsonError := json.Marshal(*db)
 		if jsonError != nil {
 			fmt.Printf("JSON Error: %s", jsonError.Error())
+			writer.Write([]byte(fmt.Sprintf("Internal server error: %d", http.StatusInternalServerError)))
 			return
 		}
 
@@ -65,6 +69,7 @@ func CreateNewUser(db *Db) http.HandlerFunc {
 
 		if parsingError != nil {
 			fmt.Printf("Parsing Error: %s", parsingError.Error())
+			writer.Write([]byte(fmt.Sprintf("Internal server error: %d", http.StatusInternalServerError)))
 			return
 		}
 
