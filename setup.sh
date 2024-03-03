@@ -20,8 +20,7 @@
 readonly DISTRO="$(lsb_release -d | awk -F ' ' '{print tolower($2)}')"
 
 # Pull the machine's chip architecture
-if [ "$(uname -m)" == "x86_64" ]
-then
+if [[ "$(uname -m)" == "x86_64" ]]; then
   CHIP_ARCH="amd64"
 else
   CHIP_ARCH="arm64"
@@ -129,10 +128,8 @@ fi
 # 2) Go Install: here we'll install and configure Go
 # -----------------------------------------------------------------------------------------------------------
 
-
 # Install Go
-if ( which go > /dev/null )
-then
+if ( which go > /dev/null ); then
   echo "Go is already installed 🟢"
 else
   echo "Installing Go 🦫"
@@ -151,8 +148,7 @@ else
 fi
 
 # Verify installation of Go
-if ( go version > /dev/null )
-then
+if ( go version > /dev/null ); then
   echo "$(go version) 🦫 🚀"
 else
   echo "Go was not installed successfully 🔴"
